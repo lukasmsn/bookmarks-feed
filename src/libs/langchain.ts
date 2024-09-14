@@ -16,7 +16,7 @@ export interface Document {
 }
 
 export interface Bite {
-  body: string;
+  pageContent: string;
   metadata: {
     parentTitle: string;
     parentAuthor: string;
@@ -64,6 +64,17 @@ export const formattedArticles = articles.map(article => ({
 }));
 
 export const addDocumentsToStore = async (docs: Document[]) => { 
+  if (!Array.isArray(docs)) {
+    throw new Error("Expected docs to be an array");
+  }
+
+  // Validate each document
+  docs.forEach(doc => {
+    if (typeof doc.pageContent !== 'string') {
+      throw new Error("Each document must have a 'pageContent' property of type string");
+    }
+  });
+
   await documentStore.addDocuments(docs);
 };
 
@@ -101,7 +112,7 @@ export const generateBites = async (doc: Document): Promise<Bite[]> => {
 export const addBitesToStore = async (docs: Bite[]) => { 
   try {
     const formattedDocs = docs.map(doc => ({
-      pageContent: doc.body,
+      pageContent: doc.pageContent,
       metadata: doc.metadata
     }));
     console.log("Formatted docs:", JSON.stringify(formattedDocs, null, 2));
