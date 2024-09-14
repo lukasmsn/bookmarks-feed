@@ -1,6 +1,6 @@
 import Bites from "@/components/Bites";
 import "@/libs/langchain";
-import AddButton from "@/components/addButton";
+// import AddButton from "@/components/addButton";
 // import "@/data/safeJson";
 
 export default function Home() {
