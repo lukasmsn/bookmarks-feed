@@ -1,4 +1,4 @@
-import Bites from "@/components/Bites";
+import Bites from "../components/Bites";
 import "@/libs/langchain";
 // import AddButton from "@/components/addButton";
 // import "@/data/safeJson";
