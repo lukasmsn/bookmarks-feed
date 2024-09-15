@@ -29,7 +29,7 @@ export default function Bite({ bite, showButtons }: BiteProps) {
       >
         <div className="space-y-0">
           <h2 className="md:text-lg font-semibold">{bite.metadata.title}</h2>
-          <p className="flex space-x-1">
+          <p className="flex-row space-x-1">
             <span className="author text-sm md:text-base text-gray-400 font-medium">
               {bite.metadata.parentAuthor} •
             </span>
