@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 
 export interface BiteType {
   id: string;
-  content: string;
+  pageContent: string;
   metadata: {
     parentTitle: string;
     parentAuthor: string;
@@ -16,9 +16,10 @@ export interface BiteType {
 export interface BiteProps {
   bite: BiteType;
   showButtons: boolean;
+  showTitles: boolean;
 }
 
-export default function Bite({ bite, showButtons }: BiteProps) {
+export default function Bite({ bite, showButtons, showTitles }: BiteProps) {
   const router = useRouter();
 
   return (
@@ -28,17 +29,32 @@ export default function Bite({ bite, showButtons }: BiteProps) {
         className="bite-entry hover:bg-gray-100 rounded-none sm:rounded-2xl pt-2 pb-3 md:pt-3 md:pb-4 px-5 cursor-pointer"
       >
         <div className="space-y-0">
-          <h2 className="md:text-lg font-semibold">{bite.metadata.title}</h2>
-          <p className="flex-row space-x-1">
-            <span className="author text-sm md:text-base text-gray-400 font-medium">
-              {bite.metadata.parentAuthor} •
-            </span>
-            <span className="title text-sm md:text-base text-gray-400 font-medium">
-              {bite.metadata.parentTitle}
-            </span>
-          </p>
+          {showTitles ? (
+            <>
+              <h2 className="md:text-lg font-semibold">
+                {bite.metadata.title}
+              </h2>
+              <p className="flex-row space-x-1">
+                <span className="author text-sm md:text-base text-gray-400 font-medium">
+                  {bite.metadata.parentAuthor} •
+                </span>
+                <span className="title text-sm md:text-base text-gray-400 font-medium">
+                  {bite.metadata.parentTitle}
+                </span>
+              </p>
+            </>
+          ) : (
+            <p className="flex-col space-x-1">
+              <span className="author text-sm md:text-base text-gray-700 font-bold">
+                {bite.metadata.parentAuthor}
+              </span>
+              <span className="title text-sm md:text-base text-gray-400 font-medium">
+                • {bite.metadata.parentTitle}
+              </span>
+            </p>
+          )}
         </div>
-        <p className="content mt-1 text-sm md:text-base">{bite.content}</p>
+        <p className="content text-sm md:text-base">{bite.pageContent}</p>
         {showButtons && (
           <div className="bite-buttons">
             <hr className="my-4 border-t border-gray-200" />

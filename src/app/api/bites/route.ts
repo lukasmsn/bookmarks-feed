@@ -22,5 +22,8 @@ export async function GET(request: Request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 
-  return NextResponse.json(data);
+  // Shuffle the data array
+  const shuffledData = data.sort(() => Math.random() - 0.5);
+
+  return NextResponse.json(shuffledData);
 }

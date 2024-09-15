@@ -1,17 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import { addDocumentsToStore, generateBites, addBitesToStore } from "@/libs/langchain";
+// import { addDocumentsToStore } from "@/libs/langchain";
+import { addBitesToStore } from "@/libs/langchain";
 
 export async function POST(req: NextRequest) {
-  console.log("Inserting document");
-  const { document } = await req.json();
-  await addDocumentsToStore([document]);
-  console.log("Successfully inserted document");
-
-  const bites = await generateBites(document);
-  console.log("Successfully generated bites");
-  console.log(bites);
-
-  const result = await addBitesToStore(bites);
-  console.log("Successfully inserted document");
-  return NextResponse.json(result);
+  const data = await req.json();
+  console.log("Data in insert route:", data);
+  await addBitesToStore(data.bites);
+  console.log("Added bites to store");
+  return NextResponse.json({ message: "Successfully inserted document" });
 }

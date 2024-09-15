@@ -1,8 +1,9 @@
 import { SupabaseVectorStore } from "@langchain/community/vectorstores/supabase";
 import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
-import articles from "../data/documents.json";
+// import articles from "../data/documents.json";
 
 import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
 console.log("Running langchain");
 
@@ -22,6 +23,7 @@ export interface Bite {
     parentAuthor: string;
     parentUrl: string;
     title: string;
+    threadId: string;
   };
 }
 
@@ -54,14 +56,14 @@ export const biteStore = new SupabaseVectorStore(embeddings, {
   queryName: "match_bites",
 });
 
-export const formattedArticles = articles.map(article => ({
-  content: article.content,
-  metadata: {
-    title: article.title,
-    author: article.author,
-    url: article.url,
-  },
-}));
+// export const formattedArticles = articles.map(article => ({
+//   pageContent: article.content,
+//   metadata: {
+//     title: article.title,
+//     author: article.author,
+//     url: article.url,
+//   },
+// }));
 
 export const addDocumentsToStore = async (docs: Document[]) => { 
   if (!Array.isArray(docs)) {
@@ -79,6 +81,7 @@ export const addDocumentsToStore = async (docs: Document[]) => {
 };
 
 export const generateBites = async (doc: Document): Promise<Bite[]> => {
+  const threadId = uuidv4(); 
   const response = await llm.invoke([
     [
       "system",
@@ -100,6 +103,7 @@ export const generateBites = async (doc: Document): Promise<Bite[]> => {
       parentAuthor: doc.metadata.author,
       parentUrl: doc.metadata.url,
       title: insight.title,
+      threadId: threadId, 
     },
     pageContent: insight.content,
   }));
@@ -109,8 +113,59 @@ export const generateBites = async (doc: Document): Promise<Bite[]> => {
   return formattedResponse;
 }
 
+export const generateBitesFromWeb = async (webUrl: string): Promise<Bite[]> => {
+  console.log("Generating bites from web");
+  const htmlResponse = await fetch(webUrl);
+  const htmlText = await htmlResponse.text();
+  const cleanedHtml = htmlText
+    .replace(/style="[^"]*"/gi, "")
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/\s*on\w+="[^"]*"/gi, "")
+    .replace(
+      /<script(?![^>]*application\/ld\+json)[^>]*>[\s\S]*?<\/script>/gi,
+      ""
+    )
+    .replace(/<[^>]*>/g, "")
+    .replace(/\s+/g, " ");
+
+  // const threadId = uuidv4();
+  const response = await llm.invoke([
+    [
+      "system",
+      "You are a helpful assistant who extracts the most engaging insights from text in a concise way. Based on the input above, write the top 10 contrarian insights from the text in 500 characters or less per insight. Also provide a provoking and catchy title. Write from the author's point of view. Use clear language, short sentences and minmize academic or journalistic language. Use an engaging and intriguing hook as the first sentence. Each insight should have a contradiction or other element that clarifies how it differs from conventional wisdom. Only present one point as poignant and information-dense as possible. Make sure the insights cover independent points and can be understood without any context beyond their own content. Return all of them as json with the following schema, leaving URL empty: [{metadata:{articleTitle:'',author:'',url:''},insightTitle:'',content:'first insight example'},..."
+    ],
+    [
+      "human",
+      `Here is the document: ${cleanedHtml}`
+    ],
+  ]);
+
+  const jsonResponse = JSON.parse(typeof response.content === 'string' ? response.content : JSON.stringify(response.content));
+  console.log(jsonResponse);
+
+  const threadId = uuidv4(); 
+
+  const formattedResponse = jsonResponse.insights.map((bite: { metadata: { articleTitle: string; author: string; url: string }; insightTitle: string; content: string }) => ({
+    metadata: {
+      parentTitle: bite.metadata.articleTitle,
+      parentAuthor: bite.metadata.author,
+      parentUrl: webUrl,
+      title: bite.insightTitle,
+      threadId: threadId,
+    },
+    pageContent: bite.content,
+  }));
+
+  console.log(formattedResponse);
+
+  return formattedResponse;
+}
+
+// generateBitesFromWeb("https://model-thinking.com/p/thames-into-tyburn");
+
 export const addBitesToStore = async (docs: Bite[]) => { 
   try {
+    console.log(docs);
     const formattedDocs = docs.map(doc => ({
       pageContent: doc.pageContent,
       metadata: doc.metadata
@@ -131,7 +186,16 @@ export const addBitesToStore = async (docs: Bite[]) => {
 
 // (async () => {
 //   try {
-//     const newBites = await generateBites(formattedArticles[1]);
+//     const article = articles[2];
+//     const formattedArticle: Document = {
+//       pageContent: article.content || "",
+//       metadata: {
+//         title: article.metadata.title,
+//         author: article.metadata.author,
+//         url: article.metadata.url,
+//       }
+//     };
+//     const newBites = await generateBites(formattedArticle);
 //     console.log("NEW BITES", JSON.stringify(newBites, null, 2));
 //     console.log("Embeddings configuration:", embeddings);
 //     console.log("Supabase client:", supabaseClient);
@@ -140,3 +204,4 @@ export const addBitesToStore = async (docs: Bite[]) => {
 //     console.error("Error in main execution:", error);
 //   }
 // })();
+
