@@ -2,12 +2,12 @@
 
 import { useState } from "react";
 // import AddButton from "@/components/addButton";
-import Bite from "@/components/Bite";
-import { BiteType } from "@/components/Bite";
+import LocalBite from "@/components/LocalBite";
+import { LocalBiteType } from "@/components/LocalBite";
 
 export default function AddPage() {
   const [url, setUrl] = useState("");
-  const [bites, setBites] = useState<BiteType[] | null>(null);
+  const [bites, setBites] = useState<LocalBiteType[] | null>(null);
 
   return (
     <>
@@ -39,8 +39,8 @@ export default function AddPage() {
       </div>
       {bites && (
         <div className="min-h-screen py-4 flex flex-col items-center">
-          {bites?.map((bite: BiteType, index: number) => (
-            <Bite
+          {bites?.map((bite: LocalBiteType, index: number) => (
+            <LocalBite
               bite={bite}
               key={index}
               showButtons={false}

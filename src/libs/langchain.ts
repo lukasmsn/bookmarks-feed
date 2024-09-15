@@ -5,7 +5,7 @@ import { ChatOpenAI, OpenAIEmbeddings } from "@langchain/openai";
 import { createClient } from "@supabase/supabase-js";
 import { v4 as uuidv4 } from 'uuid'; // Import UUID library
 
-console.log("Running langchain");
+console.log("Running langchain file");
 
 export interface Document {
   pageContent: string;
