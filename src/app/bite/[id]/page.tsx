@@ -8,7 +8,7 @@ import Bite from "@/components/Bite";
 export default function BiteDetail() {
   const params = useParams();
   const id = params?.id as string;
-  const [bite, setBite] = useState<Bite | null>(null);
+  const [bite, setBite] = useState<BiteType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
