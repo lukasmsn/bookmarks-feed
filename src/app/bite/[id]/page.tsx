@@ -52,7 +52,7 @@ export default function BiteDetail() {
           </svg>
           {/* <AddButton /> */}
         </div>
-        <Bite bite={bite} showButtons={true} />
+        <Bite bite={bite} showButtons={true} showTitles={true} />
       </main>
     </div>
   );
