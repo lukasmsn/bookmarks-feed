@@ -128,11 +128,13 @@ export const generateBitesFromWeb = async (webUrl: string): Promise<Bite[]> => {
     .replace(/<[^>]*>/g, "")
     .replace(/\s+/g, " ");
 
+  console.log(cleanedHtml);
+
   // const threadId = uuidv4();
   const response = await llm.invoke([
     [
       "system",
-      "You are a helpful assistant who extracts the most engaging insights from text in a concise way. Based on the input above, write the top 10 contrarian insights from the text in 500 characters or less per insight. Also provide a provoking and catchy title. Write from the author's point of view. Use clear language, short sentences and minmize academic or journalistic language. Use an engaging and intriguing hook as the first sentence. Each insight should have a contradiction or other element that clarifies how it differs from conventional wisdom. Only present one point as poignant and information-dense as possible. Make sure the insights cover independent points and can be understood without any context beyond their own content. Return all of them as json with the following schema, leaving URL empty: [{metadata:{articleTitle:'',author:'',url:''},insightTitle:'',content:'first insight example'},..."
+      "You are a helpful assistant who extracts the most engaging insights from text in a concise way. Based on the input above, write the top 10 contrarian insights from the text in 500 characters or less per insight. Also provide a provoking and catchy title. Write from the author's point of view. Use clear language, short sentences and minmize academic or journalistic language. Use an engaging and intriguing hook as the first sentence. Each insight should have a contradiction or other element that clarifies how it differs from conventional wisdom. Only present one point as poignant and information-dense as possible. Make sure the insights cover independent points and can be understood without any context beyond their own content. Return a json array with one object per insight with the following schema: {metadata:{articleTitle:'',author:'',url:''},insightTitle:'',content:'first insight example'}"
     ],
     [
       "human",
